@@ -110,7 +110,7 @@ The API implements standard HTTP status codes:
 7. Create version history system
 
 ## Support
-For support, please open an issue in the repository or contact [your-email]
+For support, please open an issue in the repository or contact [musawirbangash@hotmail.com]
 
 ## License
 [Your chosen license]
