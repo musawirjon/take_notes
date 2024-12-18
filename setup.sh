@@ -23,8 +23,11 @@ pip install -r requirements.txt
 # Create .env file
 echo -e "${GREEN}Creating .env file...${NC}"
 cat > .env << EOL
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+# Database credentials
+DB_USER=root
+DB_PASSWORD=root
+DB_NAME=note_taking_cs
+DATABASE_URL=mysql+pymysql://${DB_USER:-root}:${DB_PASSWORD:-root}@localhost:3306/${DB_NAME:-note_taking_cs}
 
 # JWT
 SECRET_KEY=your-secret-key-here
@@ -54,7 +57,7 @@ alembic upgrade head
 
 # Start the application
 echo -e "${GREEN}Starting the application...${NC}"
-uvicorn backend.app.main:app --reload
+uvicorn app.main:app --reload
 
 echo -e "${BLUE}Setup complete!${NC}"
 echo -e "${GREEN}You can now access:${NC}"
