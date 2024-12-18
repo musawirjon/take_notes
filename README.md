@@ -1,117 +1,68 @@
-# AI Notes API
+# FastAPI Note-Taking API
 
-A FastAPI-based backend for an AI-powered note-taking application. This API provides a robust foundation for building a full-featured note-taking system with AI capabilities.
+A FastAPI-based REST API for note-taking with user authentication.
 
-## Features
+## Features Implemented
 
-### Current Implementation
-- RESTful API endpoints for note management (CRUD operations)
-- SQLAlchemy database integration with User and Note models
-- Pydantic schemas for data validation
-- Structured project architecture
-- CORS middleware enabled
-- Automatic API documentation
+### Authentication
+- JWT-based authentication (access & refresh tokens)
+- User registration and login
+- Password hashing with bcrypt
 
-### Planned Features
-1. **User Authentication**
-   - JWT token implementation
-   - Secure password hashing
-   - User registration and login flows
+### User Management
+- User profile operations (get, update, delete)
+- Email validation
+- Secure password handling
 
-2. **AI Integration**
-   - Note content analysis
-   - Smart categorization
-   - Automated tagging
-   - Content summarization
-   - Key points extraction
+### Notes
+- CRUD operations for notes
+- Notes linked to user accounts
+- Protected routes with JWT
 
-3. **Note Organization**
-   - Categories and tags
-   - Hierarchical organization
-   - Custom metadata support
-
-4. **Search Functionality**
-   - Full-text search
-   - Advanced filtering options
-   - Tag-based search
-
-5. **Security & Performance**
-   - Rate limiting
-   - Request validation
-   - Comprehensive error handling
-   - Data encryption
+### Testing
+- Comprehensive test suite
+- Separate test database
+- Auth, User, and Notes tests
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.8+
-- pip (Python package manager)
+1. Run the setup script:
 
-### Installation
+```bash
+chmod +x setup.sh
+./setup.sh
 
-1. Clone and setup: 
-- bash
-- git clone <repository-url>
-- cd ai_notes
-- python -m venv venv
-- source venv/bin/activate # Windows: venv\Scripts\activate
-- pip install -r requirements.txt
+2. Access the API:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
-2. Create `.env` file:
-- env
-- DATABASE_URL=sqlite:///./notes.db
-- 
-- 3. Run the application:
-- bash
-- uvicorn app.main:app --reload
+## Project Structure
 
 
-## Technical Stack
-- **FastAPI**: Modern, fast web framework
-- **SQLAlchemy**: SQL toolkit and ORM
-- **Pydantic**: Data validation
-- **uvicorn**: ASGI server
-- **python-jose**: JWT handling
-- **passlib**: Password hashing
 
-## Dependencies
-- fastapi==0.104.1
-- uvicorn==0.24.0
-- sqlalchemy==2.0.23
-- pydantic==2.5.2
-- python-jose==3.3.0
-- passlib==1.7.4
-- python-multipart==0.0.6
-- python-dotenv==1.0.0
+## To-Do
 
-## Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+### AI Integration
+- Meeting services integration
+- Speech-to-text for meeting recordings
+- Automatic meeting summary generation
+- Key points extraction
+- Action items identification
+- Multiple speaker recognition
 
-## Error Handling
-The API implements standard HTTP status codes:
-- 200: Successful operation
-- 201: Resource created
-- 400: Bad request
-- 401: Unauthorized
-- 404: Resource not found
-- 500: Server error
+### Technical Enhancements
+- Docker containerization
+- CI/CD pipeline
+- API documentation
+- Rate limiting
+- Caching layer
+- Advanced logging
 
-## Future Roadmap
-1. Implement user authentication system
-2. Add AI processing capabilities
-3. Develop search functionality
-4. Add note categorization
-5. Implement sharing features
-6. Add collaboration tools
-7. Create version history system
+### Features
+- Note sharing
+- Note categories/tags
+- Search functionality
+- File attachments
+- Note versioning
 
-## Support
-For support, please open an issue in the repository or contact [musawirbangash@hotmail.com]
-
-## License
-[Your chosen license]
 

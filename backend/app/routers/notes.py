@@ -1,38 +1,41 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, status
 from typing import List
-from ..database import get_db
-from ..schemas import schemas
-from ..crud import notes
+from backend.app.controllers.note_controller import NoteController
+from backend.app.schemas.note import NoteCreate, NoteUpdate, NoteResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/notes", tags=["notes"])
 
-@router.get("/notes/", response_model=List[schemas.Note])
-def read_notes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    # TODO: Get user_id from JWT token
-    user_id = 1  # Placeholder
-    return notes.get_notes(db, user_id=user_id, skip=skip, limit=limit)
+@router.post("", response_model=NoteResponse, status_code=status.HTTP_201_CREATED)
+async def create_note(
+    note_data: NoteCreate,
+    controller: NoteController = Depends()
+):
+    return await controller.create_note(note_data)
 
-@router.post("/notes/", response_model=schemas.Note)
-def create_note(note: schemas.NoteCreate, db: Session = Depends(get_db)):
-    # TODO: Get user_id from JWT token
-    user_id = 1  # Placeholder
-    return notes.create_note(db=db, note=note, user_id=user_id)
+@router.get("", response_model=List[NoteResponse])
+async def get_notes(
+    controller: NoteController = Depends()
+):
+    return await controller.get_notes()
 
-@router.put("/notes/{note_id}", response_model=schemas.Note)
-def update_note(note_id: int, note: schemas.NoteCreate, db: Session = Depends(get_db)):
-    # TODO: Get user_id from JWT token
-    user_id = 1  # Placeholder
-    db_note = notes.update_note(db=db, note_id=note_id, note=note, user_id=user_id)
-    if db_note is None:
-        raise HTTPException(status_code=404, detail="Note not found")
-    return db_note
+@router.get("/{note_id}", response_model=NoteResponse)
+async def get_note(
+    note_id: str,
+    controller: NoteController = Depends()
+):
+    return await controller.get_note(note_id)
 
-@router.delete("/notes/{note_id}")
-def delete_note(note_id: int, db: Session = Depends(get_db)):
-    # TODO: Get user_id from JWT token
-    user_id = 1  # Placeholder
-    success = notes.delete_note(db=db, note_id=note_id, user_id=user_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Note not found")
-    return {"message": "Note deleted successfully"} 
+@router.put("/{note_id}", response_model=NoteResponse)
+async def update_note(
+    note_id: str,
+    note_data: NoteUpdate,
+    controller: NoteController = Depends()
+):
+    return await controller.update_note(note_id, note_data)
+
+@router.delete("/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_note(
+    note_id: str,
+    controller: NoteController = Depends()
+):
+    return await controller.delete_note(note_id) 
