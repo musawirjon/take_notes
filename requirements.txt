@@ -10,10 +10,12 @@ alembic==1.13.1
 python-dotenv==1.0.1
 pytest==8.0.1
 httpx==0.26.0
-mysqlclient==2.2.4     # MySQL database adapter (for production)
-pymysql==1.1.0         # Pure Python MySQL client library
-cryptography==42.0.5   # Required for PyMySQL
-aiomysql==0.2.0        # For async MySQL support
-greenlet==3.0.3        # Required for async SQLAlchemy
+email-validator>=2.0.0
+# MySQL related packages (commented for now, uncomment when needed)
+# mysqlclient==2.2.4     # MySQL database adapter (for production)
+# pymysql==1.1.0         # Pure Python MySQL client library
+cryptography==42.0.5   # Keep this as it's needed for other features
+# aiomysql==0.2.0        # For async MySQL support
+greenlet==3.0.3        # Keep this as it's needed for async SQLAlchemy
 aiosqlite==0.19.0      # For SQLite in tests
 pytest-asyncio==0.23.5 # For async test support 

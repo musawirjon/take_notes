@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app.models.note import Note
+from app.models.notes import Note
 from app.schemas.note import NoteCreate, NoteUpdate
 from app.auth.security import generate_uuid
 

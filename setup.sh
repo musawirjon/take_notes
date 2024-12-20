@@ -27,7 +27,9 @@ cat > .env << EOL
 DB_USER=root
 DB_PASSWORD=root
 DB_NAME=note_taking_cs
-DATABASE_URL=mysql+pymysql://${DB_USER:-root}:${DB_PASSWORD:-root}@localhost:3306/${DB_NAME:-note_taking_cs}
+
+# DATABASE_URL=mysql+pymysql://${DB_USER:-root}:${DB_PASSWORD:-root}@localhost:3306/${DB_NAME:-note_taking_cs}
+DATABASE_URL=sqlite:///./app.db
 
 # JWT
 SECRET_KEY=your-secret-key-here

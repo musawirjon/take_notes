@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.note import NoteCreate, NoteUpdate
 from app.services.note_service import NoteService
-from app.auth.jwt import get_current_user
+from app.auth.dependencies import get_current_user
 
 class NoteController:
     def __init__(

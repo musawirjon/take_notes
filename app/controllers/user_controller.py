@@ -4,7 +4,7 @@ from app.database import get_db
 from app.schemas.user import UserUpdate
 from app.models.user import User
 from app.services import user_service
-from app.auth.jwt import get_current_user
+from app.auth.dependencies import get_current_user
 
 class UserController:
     def __init__(
