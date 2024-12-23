@@ -64,5 +64,14 @@ chmod +x setup.sh
 - Search functionality
 - File attachments
 - Note versioning
+- Real-time meeting transcription
+- Automated note-taking
+- AI-powered meeting summaries
+- WebSocket support for live updates
+- Background job processing
+- Email notifications
+- Multi-tenant support
+- Secure authentication
+
 
 

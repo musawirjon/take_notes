@@ -1,38 +1,38 @@
-from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy.orm import Session
 from app.models.user import User
+import app.crud.users as users
 from app.schemas.user import UserCreate, UserUpdate
-from app.auth.security import get_password_hash, generate_uuid
+from app.auth.security import get_password_hash, verify_password
+from fastapi import HTTPException
 
 class UserService:
-    def __init__(self, db: Session):
-        self.db = db
+    @staticmethod
+    async def create_user(db: Session, *, user_in: UserCreate) -> User:
+        # Check if user exists
+        if user.get_by_email(db, email=user_in.email):
+            raise HTTPException(
+                status_code=400,
+                detail="User with this email already exists"
+            )
+        
+        # Hash password
+        hashed_password = get_password_hash(user_in.password)
+        user_data = user_in.dict()
+        user_data["hashed_password"] = hashed_password
+        del user_data["password"]
+        
+        return user.create(db=db, obj_in=user_data)
 
-    def get_by_id(self, user_id: str) -> Optional[User]:
-        return self.db.query(User).filter(User.id == user_id).first()
+    @staticmethod
+    async def authenticate(db: Session, *, email: str, password: str) -> Optional[User]:
+        user_obj = user.get_by_email(db, email=email)
+        if not user_obj:
+            return None
+        if not verify_password(password, user_obj.hashed_password):
+            return None
+        return user_obj
 
-    def get_by_email(self, email: str) -> Optional[User]:
-        return self.db.query(User).filter(User.email == email).first()
-
-    def create(self, user_data: UserCreate) -> User:
-        user = User(
-            id=generate_uuid(),
-            email=user_data.email,
-            hashed_password=get_password_hash(user_data.password),
-            full_name=user_data.full_name
-        )
-        self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
-        return user
-
-    def update(self, user: User, user_data: UserUpdate) -> User:
-        for key, value in user_data.dict(exclude_unset=True).items():
-            setattr(user, key, value)
-        self.db.commit()
-        self.db.refresh(user)
-        return user
-
-    def delete(self, user: User) -> None:
-        self.db.delete(user)
-        self.db.commit() 
+    @staticmethod
+    async def get_user_notes(db: Session, user_id: str, skip: int = 0, limit: int = 100):
+        return user.get_notes(db=db, user_id=user_id, skip=skip, limit=limit) 

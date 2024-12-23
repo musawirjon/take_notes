@@ -23,10 +23,14 @@ pip install -r requirements.txt
 # Create .env file
 echo -e "${GREEN}Creating .env file...${NC}"
 cat > .env << EOL
+PROJECT_NAME=note_taking_app
+ALLOWED_ORIGINS=http://localhost,https://example.com
 # Database credentials
 DB_USER=root
 DB_PASSWORD=root
 DB_NAME=note_taking_cs
+
+REDIS_URL=redis://localhost:6379/0
 
 # DATABASE_URL=mysql+pymysql://${DB_USER:-root}:${DB_PASSWORD:-root}@localhost:3306/${DB_NAME:-note_taking_cs}
 DATABASE_URL=sqlite:///./app.db

@@ -43,3 +43,39 @@ def test_unauthorized_access(client):
     
     response = client.delete("/users/me")
     assert response.status_code == 401 
+
+@pytest.mark.asyncio
+async def test_user_notification_job(auth_client, db):
+    # Test user notification job creation
+    response = auth_client.post(
+        "/api/users/notify",
+        json={
+            "user_id": str(test_user.id),
+            "message": "Test notification"
+        }
+    )
+    assert response.status_code == 200
+
+    # Verify job creation
+    jobs_response = auth_client.get("/api/jobs/")
+    jobs = jobs_response.json()
+    assert any(
+        job["queue"] == "notifications" 
+        for job in jobs
+    )
+
+@pytest.mark.asyncio
+async def test_user_background_tasks(auth_client, db):
+    # Test background task for user data processing
+    response = auth_client.post(
+        f"/api/users/{test_user.id}/process",
+        json={
+            "task_type": "data_analysis"
+        }
+    )
+    assert response.status_code == 200
+
+    # Check job status
+    job_id = response.json()["job_id"]
+    job_status = auth_client.get(f"/api/jobs/{job_id}")
+    assert job_status.json()["status"] in ["pending", "processing"]

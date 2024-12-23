@@ -66,4 +66,26 @@ def test_login_invalid_password(client, test_user, test_user_data):
         "password": "wrongpassword"
     })
     assert response.status_code == 401
-    assert response.json()["detail"] == "Incorrect email or password" 
+    assert response.json()["detail"] == "Incorrect email or password"
+
+@pytest.mark.asyncio
+async def test_protected_job_endpoints(auth_client, client):
+    # Test unauthorized access
+    response = client.get("/api/jobs/")
+    assert response.status_code == 401
+
+    # Test authorized access
+    response = auth_client.get("/api/jobs/")
+    assert response.status_code == 200
+
+@pytest.mark.asyncio
+async def test_job_creation_with_auth(auth_client, db):
+    response = auth_client.post(
+        "/api/jobs/",
+        json={
+            "queue": "test",
+            "payload": {"test": "data"}
+        }
+    )
+    assert response.status_code == 200
+    assert response.json()["queue"] == "test" 

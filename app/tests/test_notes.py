@@ -160,3 +160,24 @@ class TestNoteValidation:
     def test_invalid_note_id(self, client, auth_headers):
         response = client.get("/notes/invalid-id", headers=auth_headers)
         assert response.status_code == 404 
+
+@pytest.mark.asyncio
+async def test_note_processing_job(auth_client, db):
+    # Create a note with processing
+    response = auth_client.post(
+        "/api/notes/",
+        json={
+            "title": "Test Note",
+            "content": "This is a test note that needs processing",
+            "process_content": True  # Trigger background job
+        }
+    )
+    assert response.status_code == 200
+    note_id = response.json()["id"]
+
+    # Check if job was created
+    jobs_response = auth_client.get("/api/jobs/")
+    assert any(
+        job["payload"].get("note_id") == note_id 
+        for job in jobs_response.json()
+    )

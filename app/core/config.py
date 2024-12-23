@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     DEBUG: bool = False
-
+    REDIS_URL: str
     class Config:
         env_file = ".env"
         extra = "allow"

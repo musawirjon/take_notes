@@ -1,59 +1,77 @@
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi.testclient import TestClient
+from sqlalchemy.pool import StaticPool
+from typing import Generator
+import asyncio
 from app.main import app
-from app.database import get_db, Base
-from app.models.user import User
-from app.auth.security import get_password_hash
+from app.models.base import Base
+from app.database import get_db
+from app.core.config import settings
 
-# Use SQLite for testing
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# Test database
+SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_TEST_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def db():
     Base.metadata.create_all(bind=engine)
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-        Base.metadata.drop_all(bind=engine)
+    yield TestingSessionLocal()
+    Base.metadata.drop_all(bind=engine)
 
-@pytest.fixture
-def client(db):
+@pytest.fixture(scope="session")
+def client(db) -> Generator:
     def override_get_db():
         try:
             yield db
         finally:
             db.close()
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
-    app.dependency_overrides.clear()
+    with TestClient(app) as c:
+        yield c
 
-@pytest.fixture
-def test_user_data():
-    return {
-        "email": "test@example.com",
-        "password": "testpassword123",
-        "full_name": "Test User"
-    }
+@pytest.fixture(scope="session")
+def event_loop():
+    loop = asyncio.get_event_loop()
+    yield loop
+    loop.close()
 
+# Add test user fixture
 @pytest.fixture
-def test_user(db, test_user_data):
+def test_user(db):
+    from app.models.user import User
+    from app.core.security import get_password_hash
+    
     user = User(
-        id="test-user-id",
-        email=test_user_data["email"],
-        hashed_password=get_password_hash(test_user_data["password"]),
-        full_name=test_user_data["full_name"]
+        email="test@example.com",
+        hashed_password=get_password_hash("testpassword"),
+        full_name="Test User",
+        is_active=True
     )
     db.add(user)
     db.commit()
     db.refresh(user)
     return user
+
+# Add auth token fixture
+@pytest.fixture
+def auth_token(test_user):
+    from app.core.security import create_access_token
+    return create_access_token(data={"sub": str(test_user.id)})
+
+# Add authorized client fixture
+@pytest.fixture
+def auth_client(client, auth_token):
+    client.headers = {
+        "Authorization": f"Bearer {auth_token}",
+        **client.headers
+    }
+    return client 

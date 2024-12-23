@@ -1,33 +1,42 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import engine
-import importlib
-import os
-from app import models
-from app.database import Base
+from app.middleware.error_handler import error_handler_middleware
+from app.services.rate_limit_service import rate_limiter
+from app.auth.dependencies import get_current_user
+from app.core.config import settings
+from app.routers import api_router
 
-Base.metadata.create_all(bind=engine)
+app = FastAPI(title=settings.PROJECT_NAME)
 
-app = FastAPI(title="AI Notes API")
+# Middleware
+app.middleware("http")(error_handler_middleware)
 
-# Configure CORS
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Dynamically import all route modules from the routes directory
-routes_dir = os.path.join(os.path.dirname(__file__), "routers")
-for filename in os.listdir(routes_dir):
-    if filename.endswith(".py") and filename != "__init__.py":
-        module_name = filename[:-3]  # Remove .py extension
-        module = importlib.import_module(f"app.routers.{module_name}")
-        if hasattr(module, "router"):
-            app.include_router(module.router)
+# Rate limiting dependency
+async def check_rate_limit(current_user = Depends(get_current_user)):
+    await rate_limiter.check_rate_limit(str(current_user.id))
+    return current_user
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to AI Notes API"} 
+# Include routers with rate limiting
+app.include_router(
+    api_router,
+    dependencies=[Depends(check_rate_limit)]
+)
+
+@app.on_event("startup")
+async def startup_event():
+    # Initialize services
+    pass
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    # Cleanup services
+    pass 
