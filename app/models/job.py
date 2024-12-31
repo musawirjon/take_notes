@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, JSON, DateTime, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
-from app.models.base import Base, TimestampMixin
+from .base import Base, TimestampMixin
 
 class Job(Base, TimestampMixin):
     __tablename__ = "jobs"

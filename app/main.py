@@ -21,9 +21,9 @@ app.add_middleware(
 )
 
 # Rate limiting dependency
-async def check_rate_limit(current_user = Depends(get_current_user)):
-    await rate_limiter.check_rate_limit(str(current_user.id))
-    return current_user
+async def check_rate_limit():
+    #await rate_limiter.check_rate_limit(str(current_user.id))
+    return True
 
 # Include routers with rate limiting
 app.include_router(

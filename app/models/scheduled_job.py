@@ -1,7 +1,7 @@
-from sqlalchemy import Column, String, JSON, Integer, Boolean
+from sqlalchemy import Column, String, JSON, Integer, Boolean, DateTime  # Import DateTime here
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from app.models.base import Base, TimestampMixin
+from .base import Base, TimestampMixin
 
 class ScheduledJob(Base, TimestampMixin):
     __tablename__ = "scheduled_jobs"
@@ -14,4 +14,4 @@ class ScheduledJob(Base, TimestampMixin):
     kwargs = Column(JSON, default=dict)
     is_active = Column(Boolean, default=True)
     last_run = Column(DateTime, nullable=True)
-    next_run = Column(DateTime, nullable=True) 
+    next_run = Column(DateTime, nullable=True)

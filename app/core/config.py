@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     DB_NAME: str
     db_host: str = "localhost"  # optional with default value
-    db_port: int = 3306  # optional with default value
+    db_port: int = 5432  # optional with default value
 
     PROJECT_NAME: str
     ALLOWED_ORIGINS: str

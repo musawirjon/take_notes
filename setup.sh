@@ -28,15 +28,16 @@ ALLOWED_ORIGINS=http://localhost,https://example.com
 # Database credentials
 DB_USER=root
 DB_PASSWORD=root
-DB_NAME=note_taking_cs
+DB_NAME=note_taker_db
 
 REDIS_URL=redis://localhost:6379/0
 
-# DATABASE_URL=mysql+pymysql://${DB_USER:-root}:${DB_PASSWORD:-root}@localhost:3306/${DB_NAME:-note_taking_cs}
-DATABASE_URL=sqlite:///./app.db
+DATABASE_URL=postgresql://root:root@localhost:5432/note_taker_db
+
+# DATABASE_URL=sqlite:///./app.db
 
 # JWT
-SECRET_KEY=your-secret-key-here
+SECRET_KEY=123456
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
@@ -45,13 +46,28 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 DEBUG=True
 EOL
 
+# Load environment variables from .env file
+if [ -f .env ]; then
+    echo "Loading .env file..."
+    export $(grep -v '^#' .env | xargs)  # This will load all the variables into the environment
+else
+    echo ".env file not found!"
+    exit 1
+fi
+
 # Initialize alembic
 echo -e "${GREEN}Initializing Alembic...${NC}"
 alembic init migrations
 
-# Update alembic.ini
+# Ensure alembic.ini uses correct database credentials
 echo -e "${GREEN}Updating alembic.ini...${NC}"
-sed -i '' 's|sqlalchemy.url = driver://user:pass@localhost/dbname|sqlalchemy.url = postgresql://user:password@localhost:5432/dbname|' alembic.ini
+
+# Update alembic.ini with correct connection string
+sed -i '' "s|sqlalchemy.url = driver://user:pass@localhost/dbname|sqlalchemy.url = postgresql://${DB_USER}:${DB_PASSWORD}@localhost:5432/${DB_NAME}|" alembic.ini
+
+# Check alembic.ini to verify the change
+echo -e "${GREEN}Check the updated alembic.ini for the correct database URL:${NC}"
+cat alembic.ini | grep sqlalchemy.url
 
 # Create initial migration
 echo -e "${GREEN}Creating initial migration...${NC}"
@@ -68,4 +84,4 @@ uvicorn app.main:app --reload
 echo -e "${BLUE}Setup complete!${NC}"
 echo -e "${GREEN}You can now access:${NC}"
 echo -e "API documentation: http://localhost:8000/docs"
-echo -e "Alternative API documentation: http://localhost:8000/redoc" 
+echo -e "Alternative API documentation: http://localhost:8000/redoc"

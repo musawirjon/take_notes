@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlalchemy.orm import Session
 from app.models.user import User
-import app.crud.users as users
+import app.crud.users as user
 from app.schemas.user import UserCreate, UserUpdate
 from app.auth.security import get_password_hash, verify_password
 from fastapi import HTTPException
@@ -18,6 +18,7 @@ class UserService:
         
         # Hash password
         hashed_password = get_password_hash(user_in.password)
+        instance_id = 1
         user_data = user_in.dict()
         user_data["hashed_password"] = hashed_password
         del user_data["password"]
